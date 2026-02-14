@@ -1,33 +1,29 @@
-// Gallery Data - แก้ไขเพิ่มรูปและวิดีโอของคุณที่นี่
-// type: 'image' หรือ 'video'
+// Background Music
+const bgMusic = new Audio('music/song.mp3');
+bgMusic.loop = true;
+bgMusic.volume = 0.1;
+
+function startMusic() {
+    bgMusic.play().catch(() => {});
+}
+
+// Gallery Data
 const galleryData = {
     smile: {
         title: 'รอยยิ้มที่น่ารักของเธอ 😍',
         items: [
-            // ตัวอย่างรูปภาพ
-            // { type: 'image', src: 'images/smile/1.jpg', caption: 'ยิ้มตอนเจอกันครั้งแรก' },
-            // { type: 'image', src: 'images/smile/2.jpg', caption: 'ยิ้มตอนกินข้าว' },
-            // ตัวอย่างวิดีโอ
-            // { type: 'video', src: 'videos/smile-moment.mp4', caption: 'วิดีโอน่ารัก' },
-            { type: 'image', emoji: '😊', caption: 'ยิ้มหวานๆ ของเธอ' },
-            { type: 'image', emoji: '🥰', caption: 'ยิ้มตอนมีความสุข' },
-            { type: 'video', emoji: '🎥', caption: 'วิดีโอน่ารักของเธอ' },
+            { type: 'image', src: 'images/you_1_1.jpg', caption: 'ยิ้มหวานๆ ของเธอ' },
+            { type: 'video', src: 'videos/you_1.mp4', caption: 'วิดีโอน่ารักของเธอ' },
+            { type: 'video', src: 'videos/you_2.mp4', caption: 'ช่วงเวลาพิเศษ' },
+            { type: 'video', src: 'videos/you_3.mp4', caption: 'ความทรงจำดีๆ' },
         ]
     },
     date: {
         title: 'เดทของเรา 💑',
         items: [
-            { type: 'image', emoji: '☕', caption: 'เดทที่คาเฟ่น่ารัก' },
-            { type: 'video', emoji: '📹', caption: 'วิดีโอตอนเดท' },
-            { type: 'image', emoji: '🎡', caption: 'เที่ยวสวนสนุก' },
-        ]
-    },
-    birthday: {
-        title: 'วันเกิดปีที่แล้ว 🎂',
-        items: [
-            { type: 'video', emoji: '🎬', caption: 'วิดีโอวันเกิด' },
-            { type: 'image', emoji: '🎂', caption: 'เป่าเค้กวันเกิด' },
-            { type: 'image', emoji: '🎁', caption: 'ของขวัญสุดพิเศษ' },
+            { type: 'image', src: 'images/date_1.jpg', caption: 'เดทที่คาเฟ่น่ารัก' },
+            { type: 'image', src: 'images/date_2.jpg', caption: 'ทานข้าวด้วยกัน' },
+            { type: 'video', src: 'videos/album_UTW001zEqMW4_output.mp4', caption: 'วิดีโอตอนเดท' },
         ]
     }
 };
@@ -37,8 +33,7 @@ let currentGallery = null;
 let currentSlide = 0;
 let isPlaying = true;
 let slideInterval = null;
-let progressInterval = null;
-const SLIDE_DURATION = 3000; // 3 วินาทีต่อรูป
+const SLIDE_DURATION = 3000;
 
 // Open Gallery
 function openGallery(galleryId) {
@@ -53,8 +48,6 @@ function openGallery(galleryId) {
     createDots(data.items.length);
     showSlide(0);
     startSlideshow();
-    
-    // Create sparkle effect
     createGallerySparkles();
 }
 
@@ -89,7 +82,6 @@ function showSlide(index) {
     const data = galleryData[currentGallery];
     const items = data.items;
     
-    // Wrap around
     if (index >= items.length) index = 0;
     if (index < 0) index = items.length - 1;
     
@@ -98,17 +90,17 @@ function showSlide(index) {
     const item = items[index];
     const slideImage = document.getElementById('slideImage');
     
-    // ล้างเนื้อหาเก่า
     slideImage.innerHTML = '';
     slideImage.className = 'slide-image';
     
     if (item.type === 'video') {
-        // แสดงวิดีโอ
+        // Video slide
         slideImage.classList.add('video-slide');
         if (item.src) {
             // มีไฟล์วิดีโอจริง
             slideImage.innerHTML = `
                 <video controls autoplay muted playsinline 
+                    style="width: 100%; height: 100%; object-fit: contain;"
                     onplay="pauseSlideshow()" 
                     onended="resumeSlideshow()"
                     onpause="checkVideoEnded(this)">
@@ -117,47 +109,44 @@ function showSlide(index) {
                 </video>
             `;
         } else {
-            // ใช้ emoji แทนตอนยังไม่มีไฟล์
-            slideImage.innerHTML = `<div class="video-placeholder">${item.emoji || '🎥'}</div>`;
+            // ไม่มีไฟล์ - แสดงกรอบเปล่า
+            slideImage.innerHTML = '';
         }
         pauseSlideshow();
     } else {
-        // แสดงรูปภาพ
+        // Image slide
         if (item.src) {
             slideImage.innerHTML = `<img src="${item.src}" alt="${item.caption}">`;
         } else {
-            slideImage.innerHTML = item.emoji || '📷';
+            // ไม่มีไฟล์ - แสดงกรอบเปล่า
+            slideImage.innerHTML = '';
         }
         resumeSlideshow();
     }
     
     document.getElementById('modalCaption').textContent = item.caption;
     
-    // Update dots
     document.querySelectorAll('.dot').forEach((dot, i) => {
         dot.classList.toggle('active', i === index);
-        // เพิ่ม icon แยกประเภท
+        // แสดง icon บน dot เพื่อแยกประเภท
         const itemType = items[i].type;
         dot.innerHTML = itemType === 'video' ? '🎬' : '';
+        dot.style.fontSize = '8px';
+        dot.style.display = 'flex';
+        dot.style.alignItems = 'center';
+        dot.style.justifyContent = 'center';
+        dot.style.lineHeight = '1';
     });
     
-    // Reset progress bar animation
     const progressBar = document.getElementById('progressBar');
     if (progressBar && isPlaying && item.type !== 'video') {
         progressBar.classList.remove('animating');
-        void progressBar.offsetWidth; // Force reflow
+        void progressBar.offsetWidth;
         progressBar.classList.add('animating');
     }
 }
 
-// Check if video ended
-function checkVideoEnded(video) {
-    if (video.ended || video.paused) {
-        resumeSlideshow();
-    }
-}
-
-// Pause slideshow
+// Pause slideshow (called when video plays)
 function pauseSlideshow() {
     if (slideInterval) {
         clearInterval(slideInterval);
@@ -169,7 +158,7 @@ function pauseSlideshow() {
     }
 }
 
-// Resume slideshow
+// Resume slideshow (called when video ends)
 function resumeSlideshow() {
     if (!isPlaying) return;
     stopSlideshow();
@@ -181,6 +170,13 @@ function resumeSlideshow() {
         progressBar.classList.remove('animating');
         void progressBar.offsetWidth;
         progressBar.classList.add('animating');
+    }
+}
+
+// Check if video ended
+function checkVideoEnded(video) {
+    if (video.ended || video.paused) {
+        resumeSlideshow();
     }
 }
 
@@ -213,18 +209,16 @@ function togglePlay() {
 function startSlideshow() {
     stopSlideshow();
     
-    // Start progress bar animation
     const progressBar = document.getElementById('progressBar');
     progressBar.classList.remove('animating');
-    void progressBar.offsetWidth; // Force reflow to restart animation
+    void progressBar.offsetWidth;
     progressBar.classList.add('animating');
     
     slideInterval = setInterval(() => {
         showSlide(currentSlide + 1);
-        // Restart progress bar animation for new slide
         const bar = document.getElementById('progressBar');
         bar.classList.remove('animating');
-        void bar.offsetWidth; // Force reflow
+        void bar.offsetWidth;
         bar.classList.add('animating');
     }, SLIDE_DURATION);
 }
@@ -235,7 +229,6 @@ function stopSlideshow() {
         clearInterval(slideInterval);
         slideInterval = null;
     }
-    // Stop progress bar animation
     const progressBar = document.getElementById('progressBar');
     if (progressBar) {
         progressBar.classList.remove('animating');
@@ -301,11 +294,8 @@ function createFloatingHearts() {
 function nextPage(pageNum) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById('page' + pageNum).classList.add('active');
-    createMusicNotes();
     
-    // Reset love meter when leaving quiz page
     if (pageNum !== 5) {
-        resetLoveMeter();
         resetLoveGame();
     }
 }
@@ -314,37 +304,9 @@ function prevPage(pageNum) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById('page' + pageNum).classList.add('active');
     
-    // Reset love meter and love game when entering/leaving quiz page
     if (pageNum !== 5) {
-        resetLoveMeter();
         resetLoveGame();
     }
-}
-
-// Reset Love Meter
-function resetLoveMeter() {
-    const meter = document.getElementById('loveMeter');
-    const fill = document.getElementById('loveMeterFill');
-    
-    if (meter && fill) {
-        meter.style.display = 'none';
-        fill.style.width = '0%';
-    }
-}
-
-// Reset Gift and Go Back
-function resetGiftAndGoBack() {
-    const box = document.getElementById('giftBox');
-    const message = document.getElementById('surpriseMessage');
-    
-    // Reset gift box
-    box.classList.remove('hidden', 'opening');
-    
-    // Hide message
-    message.classList.remove('show');
-    
-    // Go back to previous page
-    prevPage(5);
 }
 
 // Create kiss effect
@@ -358,7 +320,6 @@ function createKiss(e) {
     
     setTimeout(() => kiss.remove(), 2000);
     
-    // Create multiple kisses
     for (let i = 0; i < 5; i++) {
         setTimeout(() => {
             const extraKiss = document.createElement('div');
@@ -369,23 +330,6 @@ function createKiss(e) {
             document.body.appendChild(extraKiss);
             setTimeout(() => extraKiss.remove(), 2000);
         }, i * 200);
-    }
-}
-
-// Create rose petals
-function createRosePetals() {
-    const petals = ['🌹', '🌸', '🌺', '🏵️', '💮'];
-    for (let i = 0; i < 20; i++) {
-        setTimeout(() => {
-            const petal = document.createElement('div');
-            petal.className = 'rose-petal';
-            petal.innerHTML = petals[Math.floor(Math.random() * petals.length)];
-            petal.style.left = Math.random() * 100 + '%';
-            petal.style.animationDuration = (3 + Math.random() * 3) + 's';
-            document.body.appendChild(petal);
-            
-            setTimeout(() => petal.remove(), 6000);
-        }, i * 150);
     }
 }
 
@@ -401,7 +345,6 @@ function showSparkle(e) {
     
     setTimeout(() => sparkle.remove(), 1000);
     
-    // Create multiple sparkles
     for (let i = 0; i < 8; i++) {
         const s = document.createElement('div');
         s.className = 'sparkle';
@@ -414,29 +357,13 @@ function showSparkle(e) {
     }
 }
 
-// Love meter
-function showLoveMeter(btn) {
-    const meter = document.getElementById('loveMeter');
-    const fill = document.getElementById('loveMeterFill');
-    
-    meter.style.display = 'block';
-    setTimeout(() => {
-        fill.style.width = '100%';
-    }, 100);
-    
-    // Confetti burst
-    createConfettiBurst();
-}
-
 // Open gift
 function openGift() {
     const box = document.getElementById('giftBox');
     const message = document.getElementById('surpriseMessage');
     
-    // เริ่มแอนิเมชันกล่องหายไป
     box.classList.add('opening');
     
-    // รอแอนิเมชันกล่องเสร็จ แล้วซ่อนกล่อง แสดงข้อความแทน
     setTimeout(() => {
         box.classList.add('hidden');
         message.classList.add('show');
@@ -445,13 +372,22 @@ function openGift() {
     }, 500);
 }
 
+// Reset gift
+function resetGiftAndGoBack() {
+    const box = document.getElementById('giftBox');
+    const message = document.getElementById('surpriseMessage');
+    
+    box.classList.remove('hidden', 'opening');
+    message.classList.remove('show');
+    
+    prevPage(5);
+}
+
 // Celebrate
 function celebrate() {
     createFireworks();
     createConfettiBurst();
-    createRosePetals();
     
-    // Create hearts everywhere
     for (let i = 0; i < 50; i++) {
         setTimeout(() => {
             const heart = document.createElement('div');
@@ -499,23 +435,23 @@ function createFireworks() {
             
             for (let j = 0; j < 20; j++) {
                 const particle = document.createElement('div');
-                particle.className = 'firework-particle';
+                particle.style.position = 'fixed';
+                particle.style.width = '6px';
+                particle.style.height = '6px';
+                particle.style.borderRadius = '50%';
                 particle.style.backgroundColor = color;
                 particle.style.left = x + 'px';
                 particle.style.top = y + 'px';
+                particle.style.pointerEvents = 'none';
+                particle.style.zIndex = '90';
                 
                 const angle = (j / 20) * Math.PI * 2;
                 const velocity = 100 + Math.random() * 100;
                 const tx = Math.cos(angle) * velocity;
                 const ty = Math.sin(angle) * velocity;
                 
-                particle.style.setProperty('--tx', tx + 'px');
-                particle.style.setProperty('--ty', ty + 'px');
-                particle.style.animation = 'none';
-                
                 document.body.appendChild(particle);
                 
-                // Animate manually for better control
                 const startTime = Date.now();
                 const duration = 1000;
                 
@@ -540,72 +476,11 @@ function createFireworks() {
     }
 }
 
-// Create music notes
-function createMusicNotes() {
-    const notes = ['🎵', '🎶', '♪', '♫'];
-    
-    for (let i = 0; i < 5; i++) {
-        setTimeout(() => {
-            const note = document.createElement('div');
-            note.className = 'music-note';
-            note.innerHTML = notes[Math.floor(Math.random() * notes.length)];
-            note.style.left = (Math.random() * 80 + 10) + '%';
-            note.style.bottom = '20%';
-            note.style.animationDuration = (2 + Math.random() * 2) + 's';
-            document.body.appendChild(note);
-            
-            setTimeout(() => note.remove(), 4000);
-        }, i * 300);
-    }
-}
-
-// Click anywhere to create sparkles
-document.addEventListener('click', (e) => {
-    if (!e.target.closest('.quiz-btn') && !e.target.closest('.photo-card') && !e.target.closest('.big-heart')) {
-        const sparkle = document.createElement('div');
-        sparkle.className = 'sparkle';
-        sparkle.innerHTML = '✨';
-        sparkle.style.left = e.clientX + 'px';
-        sparkle.style.top = e.clientY + 'px';
-        document.body.appendChild(sparkle);
-        setTimeout(() => sparkle.remove(), 1000);
-    }
-});
-
-// Initialize
-createFloatingHearts();
-
-
-// ============================================
-// Love Game - Interactive Quiz Logic
-// ============================================
-
+// Love Game
 let loveGameLevel = 0;
 let noButtonRunCount = 0;
-const runningMessages = [
-    "จับไม่ได้หรอก! 😝",
-    "เร็วกว่านี้อีก! 🏃‍♀️",
-    "ไม่ให้กดหรอก 💨",
-    "หนีแล้ววว~ 🏃",
-    "อุ้ย! เกือบจับได้ 😱",
-    "เร็วเข้า! 🏃‍♂️💨",
-    "ลองกดรักดูสิ~ 💕",
-    "รักดีกว่าน้า~ ❤️"
-];
-
-const escapingMessages = [
-    "ช่วยด้วย! มันใหญ่มาก! 😱",
-    "หนีลงล่างดีกว่า! 🏃‍♂️",
-    "อย่ามาใกล้! 🙅‍♀️",
-    "มันใหญ่เกินไปแล้ว! 😰",
-    "หนีไม่พ้นแน่~ 💨",
-    "ช่วยด้วยยย~ 🆘",
-    "รักเถอะน่า~ 🥺💕",
-    "ไม่ไหวแล้วว~ 😵"
-];
 
 function handleLoveNoPress(event) {
-    // Prevent default to avoid any button submit behavior
     if (event) {
         event.preventDefault();
         event.stopPropagation();
@@ -615,91 +490,24 @@ function handleLoveNoPress(event) {
     const yesBtn = document.getElementById('loveYesBtn');
     const hint = document.getElementById('loveGameHint');
     
-    if (!noBtn || noBtn.classList.contains('caught') || noBtn.style.opacity === '0') return;
+    if (!noBtn || noBtn.style.opacity === '0') return;
     
-    // Hide hint after first interaction
     if (hint && noButtonRunCount === 0) {
-        hint.classList.add('hidden');
+        hint.style.opacity = '0';
     }
     
-    // Make the NO button run away immediately
     moveNoButton(noBtn);
-    
-    // Grow the YES button
     growYesButton(yesBtn);
-    
-    // Show running message
-    showRunningMessage(noBtn);
-    
-    // Create small confetti burst at click position
-    if (event) {
-        createClickConfetti(event.clientX, event.clientY);
-    }
     
     noButtonRunCount++;
     
-    // Check if YES button should fill the screen (after 15 clicks)
     if (loveGameLevel >= 15) {
         setTimeout(() => {
             noBtn.style.opacity = '0';
             noBtn.style.pointerEvents = 'none';
-            yesBtn.className = 'love-btn love-yes size-fill-screen';
-            
-            // Create big celebration
-            createConfettiBurst();
-            createConfettiBurst();
             createConfettiBurst();
             createFireworks();
         }, 300);
-    }
-}
-
-function createClickConfetti(x, y) {
-    const colors = ['#ff6b9d', '#ff8fab', '#ffb3c6', '#ffd700', '#ff69b4'];
-    
-    for (let i = 0; i < 15; i++) {
-        const confetti = document.createElement('div');
-        confetti.style.position = 'fixed';
-        confetti.style.left = x + 'px';
-        confetti.style.top = y + 'px';
-        confetti.style.width = (6 + Math.random() * 6) + 'px';
-        confetti.style.height = confetti.style.width;
-        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
-        confetti.style.pointerEvents = 'none';
-        confetti.style.zIndex = '1000';
-        
-        // Random direction
-        const angle = (Math.random() * Math.PI * 2);
-        const velocity = 50 + Math.random() * 100;
-        const tx = Math.cos(angle) * velocity;
-        const ty = Math.sin(angle) * velocity;
-        
-        confetti.style.animation = 'none';
-        document.body.appendChild(confetti);
-        
-        // Animate
-        const startTime = Date.now();
-        const duration = 600;
-        
-        function animate() {
-            const elapsed = Date.now() - startTime;
-            const progress = elapsed / duration;
-            
-            if (progress < 1) {
-                const currentX = x + tx * progress;
-                const currentY = y + ty * progress + 0.5 * 200 * progress * progress;
-                confetti.style.left = currentX + 'px';
-                confetti.style.top = currentY + 'px';
-                confetti.style.opacity = 1 - progress;
-                confetti.style.transform = `rotate(${progress * 360}deg)`;
-                requestAnimationFrame(animate);
-            } else {
-                confetti.remove();
-            }
-        }
-        
-        requestAnimationFrame(animate);
     }
 }
 
@@ -707,165 +515,27 @@ function moveNoButton(btn) {
     const rect = btn.getBoundingClientRect();
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
-    const yesBtn = document.getElementById('loveYesBtn');
-    const yesRect = yesBtn ? yesBtn.getBoundingClientRect() : null;
     
-    let newX, newY;
     const padding = 80;
+    const maxX = viewportWidth - rect.width - padding;
+    const maxY = viewportHeight - rect.height - padding;
     
-    // Simple escape mode - just move to bottom when YES is big
-    if (loveGameLevel >= 10) {
-        const bottomPadding = 30;
-        newX = padding + Math.random() * (viewportWidth - rect.width - padding * 2);
-        newY = viewportHeight - rect.height - bottomPadding - (Math.random() * 80);
-        btn.classList.add('escaping');
-    } else {
-        // Normal mode - simple random position
-        const maxX = viewportWidth - rect.width - padding;
-        const maxY = viewportHeight - rect.height - padding;
-        
-        // Simple random position with minimum distance from current position
-        const minDistance = 120 + (loveGameLevel * 20);
-        let attempts = 0;
-        let validPosition = false;
-        
-        while (!validPosition && attempts < 10) {
-            newX = padding + Math.random() * (maxX - padding);
-            newY = padding + Math.random() * (maxY - padding);
-            
-            const distFromCurrent = Math.sqrt(
-                Math.pow(newX - rect.left, 2) + 
-                Math.pow(newY - rect.top, 2)
-            );
-            
-            // Check if far enough from current position
-            if (distFromCurrent >= minDistance) {
-                validPosition = true;
-            }
-            attempts++;
-        }
-        
-        // If can't find valid position, just use random
-        if (!validPosition) {
-            newX = padding + Math.random() * (maxX - padding);
-            newY = padding + Math.random() * (maxY - padding);
-        }
-        
-        btn.classList.remove('escaping');
-    }
+    const newX = padding + Math.random() * (maxX - padding);
+    const newY = padding + Math.random() * (maxY - padding);
     
-    // Ensure within bounds
-    newX = Math.max(20, Math.min(newX, viewportWidth - rect.width - 20));
-    newY = Math.max(20, Math.min(newY, viewportHeight - rect.height - 20));
-    
-    // Transition speed
-    const transitionSpeed = loveGameLevel > 10 ? '0.15s' : (loveGameLevel > 5 ? '0.22s' : '0.3s');
-    
-    // Scale down as level increases
-    const scale = Math.max(0.6, 1 - (loveGameLevel * 0.04));
-    
-    // Apply position
     btn.style.position = 'fixed';
     btn.style.left = newX + 'px';
     btn.style.top = newY + 'px';
-    btn.style.transform = `scale(${scale})`;
-    btn.style.setProperty('--btn-scale', scale);
-    btn.style.transition = `all ${transitionSpeed} ease-out`;
+    btn.style.transition = 'all 0.3s ease-out';
     btn.style.zIndex = '50';
-    btn.classList.add('running');
-    
-    setTimeout(() => {
-        btn.classList.remove('running');
-    }, parseFloat(transitionSpeed) * 1000);
 }
 
 function growYesButton(btn) {
     loveGameLevel++;
     
-    // Remove previous size class
-    btn.className = 'love-btn love-yes';
-    
-    // Add size class based on level
-    if (loveGameLevel <= 15) {
-        btn.classList.add('size-' + loveGameLevel);
-    } else {
-        btn.classList.add('size-fill-screen');
-    }
-    
-    // Add pulse effect
-    btn.classList.add('pulse');
-    setTimeout(() => {
-        btn.classList.remove('pulse');
-    }, 500);
-    
-    // Create small sparkles around YES button
-    createButtonSparkles(btn);
-    
-    // Make NO button run faster as YES gets bigger
-    if (loveGameLevel > 10) {
-        btn.style.transition = 'all 0.2s ease';
-    }
-    
-    // Change card background as level increases
-    const card = document.querySelector('.love-game-card');
-    if (card) {
-        // Remove previous level classes
-        card.classList.remove('level-5', 'level-8', 'level-10', 'level-12', 'level-15');
-        // Add current level class
-        if (loveGameLevel >= 15) card.classList.add('level-15');
-        else if (loveGameLevel >= 12) card.classList.add('level-12');
-        else if (loveGameLevel >= 10) card.classList.add('level-10');
-        else if (loveGameLevel >= 8) card.classList.add('level-8');
-        else if (loveGameLevel >= 5) card.classList.add('level-5');
-    }
-}
-
-function createButtonSparkles(btn) {
-    const rect = btn.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    
-    for (let i = 0; i < 6; i++) {
-        setTimeout(() => {
-            const sparkle = document.createElement('div');
-            sparkle.innerHTML = ['✨', '💖', '💕', '💫'][Math.floor(Math.random() * 4)];
-            sparkle.style.position = 'fixed';
-            sparkle.style.left = (centerX + (Math.random() - 0.5) * rect.width * 1.5) + 'px';
-            sparkle.style.top = (centerY + (Math.random() - 0.5) * rect.height * 1.5) + 'px';
-            sparkle.style.fontSize = (20 + Math.random() * 20) + 'px';
-            sparkle.style.pointerEvents = 'none';
-            sparkle.style.zIndex = '1000';
-            sparkle.style.animation = 'sparkle 0.8s ease-out forwards';
-            document.body.appendChild(sparkle);
-            
-            setTimeout(() => sparkle.remove(), 800);
-        }, i * 50);
-    }
-}
-
-function showRunningMessage(btn) {
-    const rect = btn.getBoundingClientRect();
-    const message = document.createElement('div');
-    const isEscaping = btn.classList.contains('escaping');
-    
-    message.className = 'running-message' + (isEscaping ? ' escaping-msg' : '');
-    
-    // Use different messages for escaping mode
-    let msgText;
-    if (isEscaping) {
-        const escapeIndex = Math.min(Math.max(0, noButtonRunCount - 10), escapingMessages.length - 1);
-        msgText = escapingMessages[escapeIndex];
-    } else {
-        const runIndex = Math.min(noButtonRunCount, runningMessages.length - 1);
-        msgText = runningMessages[runIndex];
-    }
-    message.textContent = msgText;
-    
-    message.style.left = (rect.left + rect.width / 2 - 60) + 'px';
-    message.style.top = (rect.top - 50) + 'px';
-    document.body.appendChild(message);
-    
-    setTimeout(() => message.remove(), 2000);
+    const scale = 1 + (loveGameLevel * 0.15);
+    btn.style.transform = `scale(${Math.min(scale, 5)})`;
+    btn.style.transition = 'transform 0.3s ease';
 }
 
 function handleLoveYes() {
@@ -873,28 +543,14 @@ function handleLoveYes() {
     const successMsg = document.getElementById('loveSuccessMessage');
     const hint = document.getElementById('loveGameHint');
     
-    // Hide options
-    if (options) {
-        options.style.display = 'none';
-    }
+    if (options) options.style.display = 'none';
+    if (hint) hint.style.display = 'none';
+    if (successMsg) successMsg.style.display = 'block';
     
-    // Hide hint
-    if (hint) {
-        hint.style.display = 'none';
-    }
-    
-    // Show success message
-    if (successMsg) {
-        successMsg.style.display = 'block';
-    }
-    
-    // Big celebration
     createConfettiBurst();
     createConfettiBurst();
     createFireworks();
-    createRosePetals();
     
-    // Create lots of hearts
     for (let i = 0; i < 30; i++) {
         setTimeout(() => {
             const heart = document.createElement('div');
@@ -916,55 +572,111 @@ function resetLoveGame() {
     const successMsg = document.getElementById('loveSuccessMessage');
     const hint = document.getElementById('loveGameHint');
     
-    // Reset variables
     loveGameLevel = 0;
     noButtonRunCount = 0;
     
-    // Reset NO button
     if (noBtn) {
-        noBtn.style.position = 'relative';
-        noBtn.style.left = 'auto';
-        noBtn.style.top = 'auto';
-        noBtn.style.transform = '';
-        noBtn.style.transition = '';
-        noBtn.style.opacity = '1';
-        noBtn.style.pointerEvents = 'auto';
-        noBtn.style.zIndex = '';
-        noBtn.classList.remove('running', 'caught', 'escaping');
+        noBtn.style = '';
     }
     
-    // Reset YES button
     if (yesBtn) {
-        for (let i = 0; i <= 15; i++) {
-            yesBtn.classList.remove('size-' + i);
-        }
-        yesBtn.classList.remove('size-fill-screen', 'pulse');
         yesBtn.style = '';
     }
     
-    // Reset card background
-    const card = document.querySelector('.love-game-card');
-    if (card) {
-        card.classList.remove('level-5', 'level-8', 'level-10', 'level-12', 'level-15');
-    }
-    
-    // Show options
-    if (options) {
-        options.style.display = 'flex';
-    }
-    
-    // Hide success message
-    if (successMsg) {
-        successMsg.style.display = 'none';
-    }
-    
-    // Show hint
+    if (options) options.style.display = 'flex';
+    if (successMsg) successMsg.style.display = 'none';
     if (hint) {
         hint.style.display = 'block';
-        hint.classList.remove('hidden');
+        hint.style.opacity = '1';
     }
 }
 
-// Reset love game when leaving page 5
-const originalNextPage = window.nextPage;
-const originalPrevPage = window.prevPage;
+// ============================================
+// Card Preview Slideshow
+// ============================================
+const cardPreviewIntervals = [];
+
+function initCardPreviews() {
+    const placeholders = document.querySelectorAll('.photo-placeholder[data-gallery]');
+    
+    placeholders.forEach(placeholder => {
+        const galleryId = placeholder.dataset.gallery;
+        const data = galleryData[galleryId];
+        if (!data || !data.items.length) return;
+        
+        // Clear existing content
+        placeholder.innerHTML = '';
+        
+        // Create slides
+        data.items.forEach((item, index) => {
+            const slide = document.createElement('div');
+            slide.className = 'card-slide' + (index === 0 ? ' active' : '');
+            
+            if (item.type === 'video') {
+                // For video: show first frame as poster or a thumbnail
+                if (item.src) {
+                    const video = document.createElement('video');
+                    video.src = item.src;
+                    video.muted = true;
+                    video.playsInline = true;
+                    video.preload = 'metadata';
+                    video.currentTime = 0.5; // grab a frame at 0.5s
+                    slide.appendChild(video);
+                }
+                // Play icon overlay
+                const icon = document.createElement('div');
+                icon.className = 'video-icon';
+                icon.innerHTML = '▶️';
+                slide.appendChild(icon);
+            } else {
+                // Image
+                if (item.src) {
+                    const img = document.createElement('img');
+                    img.src = item.src;
+                    img.alt = item.caption;
+                    img.loading = 'lazy';
+                    slide.appendChild(img);
+                }
+            }
+            
+            placeholder.appendChild(slide);
+        });
+        
+        // Create dots
+        if (data.items.length > 1) {
+            const dotsContainer = document.createElement('div');
+            dotsContainer.className = 'card-dots';
+            
+            data.items.forEach((_, index) => {
+                const dot = document.createElement('div');
+                dot.className = 'card-dot' + (index === 0 ? ' active' : '');
+                dotsContainer.appendChild(dot);
+            });
+            
+            placeholder.appendChild(dotsContainer);
+        }
+        
+        // Auto-swipe
+        if (data.items.length > 1) {
+            let currentIndex = 0;
+            const slides = placeholder.querySelectorAll('.card-slide');
+            const dots = placeholder.querySelectorAll('.card-dot');
+            
+            const interval = setInterval(() => {
+                slides[currentIndex].classList.remove('active');
+                if (dots[currentIndex]) dots[currentIndex].classList.remove('active');
+                
+                currentIndex = (currentIndex + 1) % slides.length;
+                
+                slides[currentIndex].classList.add('active');
+                if (dots[currentIndex]) dots[currentIndex].classList.add('active');
+            }, 2500);
+            
+            cardPreviewIntervals.push(interval);
+        }
+    });
+}
+
+// Initialize
+createFloatingHearts();
+initCardPreviews();

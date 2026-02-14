@@ -221,13 +221,6 @@ body {
     overflow: hidden;
 }
 
-.photo-placeholder img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 15px;
-}
-
 .photo-caption {
     text-align: center;
     color: #ff6b9d;
@@ -240,6 +233,78 @@ body {
     color: #999;
     font-size: 0.8rem;
     margin-top: 5px;
+}
+
+/* Card Preview Slideshow */
+.photo-placeholder {
+    position: relative;
+}
+
+.card-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-slide.active {
+    opacity: 1;
+}
+
+.card-slide img,
+.card-slide video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 15px;
+}
+
+.card-slide .video-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2.5rem;
+    background: rgba(0, 0, 0, 0.45);
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.card-dots {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 5px;
+    z-index: 5;
+}
+
+.card-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+}
+
+.card-dot.active {
+    background: #ff6b9d;
+    transform: scale(1.3);
+    border-color: white;
 }
 
 /* Gallery Modal */
@@ -273,9 +338,11 @@ body {
     max-width: 800px;
     width: 90%;
     max-height: 90vh;
-    overflow: hidden;
+    overflow-y: auto;
     position: relative;
     animation: slideUp 0.4s ease;
+    display: flex;
+    flex-direction: column;
 }
 
 @keyframes slideUp {
@@ -312,13 +379,14 @@ body {
     margin-top: 10px;
 }
 
-/* Slideshow */
 .slideshow-container {
     position: relative;
     background: linear-gradient(135deg, #ffe4ec, #fff0f5);
     border-radius: 20px;
     overflow: hidden;
     aspect-ratio: 4/3;
+    flex-shrink: 1;
+    min-height: 0;
 }
 
 .slideshow-slide {
@@ -335,7 +403,6 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 5rem;
     background-size: cover;
     background-position: center;
     transition: all 0.5s ease;
@@ -345,42 +412,6 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
-}
-
-/* Slideshow Dots */
-.slideshow-dots {
-    position: absolute;
-    bottom: 60px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 10px;
-    z-index: 10;
-}
-
-.dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.5);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
-    font-size: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-}
-
-.dot.active {
-    background: #ff6b9d;
-    transform: scale(1.2);
-    border-color: white;
-}
-
-.dot:hover {
-    background: #ff8fab;
 }
 
 /* Video slide styles */
@@ -399,7 +430,36 @@ body {
     color: white;
 }
 
-/* Progress Bar */
+.slideshow-dots {
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 10;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.dot.active {
+    background: #ff6b9d;
+    transform: scale(1.2);
+    border-color: white;
+}
+
+.dot:hover {
+    background: #ff8fab;
+}
+
 .slideshow-progress {
     position: absolute;
     bottom: 0;
@@ -424,12 +484,12 @@ body {
     to { width: 100%; }
 }
 
-/* Controls */
 .slideshow-controls {
     display: flex;
     justify-content: center;
     gap: 20px;
-    margin-top: 20px;
+    margin-top: 15px;
+    flex-shrink: 0;
 }
 
 .control-btn {
@@ -455,51 +515,10 @@ body {
 .modal-caption {
     text-align: center;
     color: #666;
-    margin-top: 15px;
+    margin-top: 10px;
     font-size: 1rem;
     min-height: 24px;
-}
-
-/* Gallery Responsive */
-@media (max-width: 600px) {
-    .modal-content {
-        padding: 20px;
-        width: 95%;
-    }
-    
-    .modal-title {
-        font-size: 1.4rem;
-    }
-    
-    .slideshow-container {
-        aspect-ratio: 1;
-    }
-    
-    .control-btn {
-        width: 45px;
-        height: 45px;
-        font-size: 1rem;
-    }
-    
-    /* Surprise message landscape on mobile */
-    .gift-stage {
-        width: 100%;
-        height: 300px;
-    }
-    
-    .surprise-message {
-        padding: 20px;
-        max-height: none;
-        max-width: 90%;
-    }
-    
-    .surprise-message h2 {
-        font-size: 1.3rem;
-    }
-    
-    .surprise-message p {
-        font-size: 0.9rem;
-    }
+    flex-shrink: 0;
 }
 
 /* Quiz Page */
@@ -522,34 +541,117 @@ body {
     box-shadow: 0 15px 50px rgba(255, 105, 180, 0.2);
 }
 
-.quiz-question {
-    font-size: 1.3rem;
-    color: #555;
-    margin-bottom: 25px;
+.love-game-card {
+    position: relative;
+    overflow: visible;
+    min-height: 300px;
+    transition: background 0.5s ease;
 }
 
-.quiz-options {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.quiz-btn {
-    background: linear-gradient(45deg, #fff0f5, #ffe4ec);
-    border: 2px solid #ff8fab;
-    padding: 15px 30px;
-    border-radius: 50px;
-    font-size: 1.1rem;
+.love-game-question {
+    font-size: 1.5rem;
     color: #d63384;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-family: 'Mali', sans-serif;
+    margin-bottom: 40px;
+    font-weight: 600;
 }
 
-.quiz-btn:hover {
+.love-game-options {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    min-height: 150px;
+    position: relative;
+}
+
+.love-btn {
+    padding: 20px 50px;
+    font-size: 1.4rem;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Mali', sans-serif;
+    font-weight: 700;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    position: relative;
+    user-select: none;
+}
+
+.love-yes {
     background: linear-gradient(45deg, #ff6b9d, #ff8fab);
     color: white;
-    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(255, 107, 157, 0.4);
+    transform: scale(1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    z-index: 100;
+    position: relative;
+}
+
+.love-yes:hover {
+    transform: scale(1.1);
+    box-shadow: 0 12px 35px rgba(255, 107, 157, 0.5);
+}
+
+.love-no {
+    background: linear-gradient(45deg, #e0e0e0, #f0f0f0);
+    color: #888;
+    border: 2px solid #ccc;
+    position: relative;
+    transition: all 0.2s ease;
+    z-index: 50;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.love-game-hint {
+    margin-top: 30px;
+    color: #ff8fab;
+    font-size: 1rem;
+    font-style: italic;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.love-success-message {
+    background: white;
+    padding: 40px;
+    border-radius: 25px;
+    max-width: 500px;
+    width: 100%;
+    margin-top: 20px;
+    box-shadow: 0 20px 60px rgba(255, 105, 180, 0.3);
+    animation: successPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes successPop {
+    0% { transform: scale(0); opacity: 0; }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.success-content {
+    text-align: center;
+}
+
+.success-content h3 {
+    color: #d63384;
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+}
+
+.success-content p {
+    color: #ff6b9d;
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+}
+
+.heart-explosion {
+    font-size: 2.5rem;
+    animation: heartBurst 1s ease-in-out infinite;
+}
+
+@keyframes heartBurst {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
 }
 
 /* Final Surprise Page */
@@ -577,7 +679,6 @@ body {
     50% { transform: translateY(-20px); }
 }
 
-/* Stage for gift and message - same position */
 .gift-stage {
     position: relative;
     width: 700px;
@@ -675,51 +776,6 @@ body {
     letter-spacing: 5px;
 }
 
-.surprise-message .nav-btn {
-    margin-top: 15px;
-}
-
-.surprise-message h2 {
-    font-size: 2rem;
-    color: #d63384;
-    margin-bottom: 20px;
-}
-
-.surprise-message p {
-    font-size: 1.2rem;
-    color: #555;
-    line-height: 1.8;
-}
-
-/* Confetti */
-.confetti-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 100;
-}
-
-.confetti {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    animation: confetti-fall 3s ease-out forwards;
-}
-
-@keyframes confetti-fall {
-    0% {
-        transform: translateY(-100px) rotate(0deg);
-        opacity: 1;
-    }
-    100% {
-        transform: translateY(100vh) rotate(720deg);
-        opacity: 0;
-    }
-}
-
 /* Navigation Buttons */
 .nav-btns {
     display: flex;
@@ -758,23 +814,32 @@ body {
     box-shadow: 0 8px 25px rgba(255, 107, 157, 0.4);
 }
 
-/* Rose Petals */
-.rose-petal {
+/* Confetti */
+.confetti-container {
     position: fixed;
-    font-size: 30px;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     pointer-events: none;
-    z-index: 50;
-    animation: petal-fall linear forwards;
+    z-index: 100;
 }
 
-@keyframes petal-fall {
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    animation: confetti-fall 3s ease-out forwards;
+}
+
+@keyframes confetti-fall {
     0% {
         transform: translateY(-100px) rotate(0deg);
         opacity: 1;
     }
     100% {
-        transform: translateY(100vh) rotate(360deg);
-        opacity: 0.3;
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
     }
 }
 
@@ -801,47 +866,6 @@ body {
     }
 }
 
-/* Responsive */
-@media (max-width: 600px) {
-    .welcome-text {
-        font-size: 1.8rem;
-    }
-    .big-heart {
-        font-size: 80px;
-    }
-    .letter-container,
-    .quiz-card {
-        padding: 15px;
-    }
-    .surprise-title {
-        font-size: 2rem;
-    }
-    .photo-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-    }
-    .photo-card {
-        padding: 10px;
-    }
-}
-
-/* Typewriter Effect */
-.typewriter {
-    overflow: hidden;
-    border-right: 3px solid #ff6b9d;
-    white-space: nowrap;
-    animation: typing 3s steps(40) forwards, blink-caret 0.75s step-end infinite;
-}
-
-@keyframes typing {
-    from { width: 0; }
-    to { width: 100%; }
-}
-
-@keyframes blink-caret {
-    50% { border-color: transparent; }
-}
-
 /* Sparkle Effect */
 .sparkle {
     position: fixed;
@@ -863,363 +887,32 @@ body {
     }
 }
 
-/* Love Meter */
-.love-meter {
-    background: white;
-    padding: 30px;
-    border-radius: 25px;
-    max-width: 500px;
-    width: 100%;
-    margin-bottom: 20px;
-    box-shadow: 0 15px 50px rgba(255, 105, 180, 0.2);
-}
-
-.love-meter-bar {
-    width: 100%;
-    height: 30px;
-    background: #ffe4ec;
-    border-radius: 15px;
-    overflow: hidden;
-    margin-top: 15px;
-}
-
-.love-meter-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #ff6b9d, #ff8fab);
-    border-radius: 15px;
-    width: 0%;
-    transition: width 2s ease-out;
-}
-
-.love-meter-text {
-    text-align: center;
-    color: #d63384;
-    font-size: 1.2rem;
-    margin-top: 10px;
-}
-
-/* Fireworks */
-.firework {
-    position: fixed;
-    pointer-events: none;
-    z-index: 90;
-}
-
-.firework-particle {
-    position: absolute;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    animation: firework-explode 1s ease-out forwards;
-}
-
-@keyframes firework-explode {
-    0% {
-        transform: translate(0, 0);
-        opacity: 1;
-    }
-    100% {
-        opacity: 0;
-    }
-}
-
-/* Music Note Animation */
-.music-note {
-    position: fixed;
-    font-size: 30px;
-    pointer-events: none;
-    z-index: 40;
-    animation: music-float 3s ease-out forwards;
-}
-
-@keyframes music-float {
-    0% {
-        transform: translateY(0) rotate(0deg);
-        opacity: 1;
-    }
-    100% {
-        transform: translateY(-200px) rotate(360deg);
-        opacity: 0;
-    }
-}
-
-
-/* ============================================
-   Love Game - Interactive Quiz Styles
-   ============================================ */
-
-.love-game-card {
-    position: relative;
-    overflow: visible;
-    min-height: 300px;
-    transition: background 0.5s ease;
-}
-
-/* Background changes as YES button grows */
-.love-game-card.level-5 { background: linear-gradient(135deg, #fff0f5 0%, #ffe0ec 100%); }
-.love-game-card.level-8 { background: linear-gradient(135deg, #ffe0ec 0%, #ffd0e0 100%); }
-.love-game-card.level-10 { background: linear-gradient(135deg, #ffd0e0 0%, #ffc0d5 100%); }
-.love-game-card.level-12 { background: linear-gradient(135deg, #ffc0d5 0%, #ffb0cc 100%); }
-.love-game-card.level-15 { background: linear-gradient(135deg, #ffb0cc 0%, #ffa0c5 100%); }
-
-.love-game-question {
-    font-size: 1.5rem;
-    color: #d63384;
-    margin-bottom: 40px;
-    font-weight: 600;
-}
-
-.love-game-options {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 30px;
-    min-height: 150px;
-    position: relative;
-}
-
-.love-btn {
-    padding: 20px 50px;
-    font-size: 1.4rem;
-    border-radius: 50px;
-    border: none;
-    cursor: pointer;
-    font-family: 'Mali', sans-serif;
-    font-weight: 700;
-    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    position: relative;
-    user-select: none;
-}
-
-/* Yes Button - Grows when hovering No */
-.love-yes {
-    background: linear-gradient(45deg, #ff6b9d, #ff8fab);
-    color: white;
-    box-shadow: 0 8px 25px rgba(255, 107, 157, 0.4);
-    transform: scale(1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    z-index: 100; /* Always on top of NO button */
-    position: relative;
-}
-
-.love-yes:hover {
-    transform: scale(1.1);
-    box-shadow: 0 12px 35px rgba(255, 107, 157, 0.5);
-}
-
-.love-yes.pulse {
-    animation: lovePulse 0.5s ease infinite alternate;
-}
-
-@keyframes lovePulse {
-    from { transform: scale(1); box-shadow: 0 8px 25px rgba(255, 107, 157, 0.4); }
-    to { transform: scale(1.15); box-shadow: 0 15px 40px rgba(255, 107, 157, 0.6); }
-}
-
-/* No Button - Runs away on hover */
-.love-no {
-    background: linear-gradient(45deg, #e0e0e0, #f0f0f0);
-    color: #888;
-    border: 2px solid #ccc;
-    position: relative;
-    transition: all 0.2s ease;
-    z-index: 50; /* Lower than YES button */
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-
-.love-no:hover {
-    background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
-    color: white;
-    border-color: #ff6b6b;
-}
-
-.love-no.running {
-    position: fixed;
-    z-index: 1000;
-    animation: runAway 0.3s ease;
-}
-
-@keyframes runAway {
-    0% { transform: scale(1) rotate(0deg); }
-    50% { transform: scale(0.9) rotate(10deg); }
-    100% { transform: scale(1) rotate(0deg); }
-}
-
-/* Size levels for the YES button - growing progressively with higher z-index */
-.love-yes.size-1 { transform: scale(1.15); z-index: 110; }
-.love-yes.size-2 { transform: scale(1.35); z-index: 120; }
-.love-yes.size-3 { transform: scale(1.6); z-index: 130; }
-.love-yes.size-4 { transform: scale(1.9); z-index: 140; }
-.love-yes.size-5 { transform: scale(2.3); font-size: 1.5rem; z-index: 150; }
-.love-yes.size-6 { transform: scale(2.8); font-size: 1.6rem; z-index: 160; }
-.love-yes.size-7 { transform: scale(3.4); font-size: 1.7rem; z-index: 170; }
-.love-yes.size-8 { transform: scale(4.2); font-size: 1.9rem; z-index: 180; }
-.love-yes.size-9 { transform: scale(5.2); font-size: 2.1rem; z-index: 190; }
-.love-yes.size-10 { transform: scale(6.5); font-size: 2.4rem; z-index: 200; }
-.love-yes.size-11 { transform: scale(8); font-size: 2.8rem; z-index: 210; }
-.love-yes.size-12 { transform: scale(10); font-size: 3.2rem; z-index: 220; }
-.love-yes.size-13 { transform: scale(12); font-size: 3.8rem; z-index: 230; }
-.love-yes.size-14 { transform: scale(15); font-size: 4.5rem; z-index: 240; }
-.love-yes.size-15 { transform: scale(18); font-size: 5rem; z-index: 250; }
-
-/* Fill the entire screen! */
-.love-yes.size-fill-screen {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    transform: none !important;
-    border-radius: 0 !important;
-    font-size: 6rem;
-    z-index: 9999;
-    animation: heartbeat 0.5s ease-in-out infinite, screenGlow 2s ease-in-out infinite alternate;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-shadow: 0 0 30px rgba(255, 255, 255, 0.8), 0 0 60px rgba(255, 107, 157, 0.6);
-}
-
-.love-yes.size-fill-screen::after {
-    content: 'กดเลย! 💕';
-    font-size: 2rem;
-    display: block;
-    margin-top: 20px;
-    animation: bounce 1s ease-in-out infinite;
-}
-
-@keyframes screenGlow {
-    from { 
-        box-shadow: inset 0 0 100px rgba(255, 255, 255, 0.3);
-    }
-    to { 
-        box-shadow: inset 0 0 200px rgba(255, 255, 255, 0.6);
-    }
-}
-
-/* Game hint text */
-.love-game-hint {
-    margin-top: 30px;
-    color: #ff8fab;
-    font-size: 1rem;
-    font-style: italic;
-    opacity: 1;
-    transition: opacity 0.3s ease;
-}
-
-.love-game-hint.hidden {
-    opacity: 0;
-}
-
-/* Success Message */
-.love-success-message {
-    background: white;
-    padding: 40px;
-    border-radius: 25px;
-    max-width: 500px;
-    width: 100%;
-    margin-top: 20px;
-    box-shadow: 0 20px 60px rgba(255, 105, 180, 0.3);
-    animation: successPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-}
-
-@keyframes successPop {
-    0% { transform: scale(0); opacity: 0; }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-.success-content {
-    text-align: center;
-}
-
-.success-content h3 {
-    color: #d63384;
-    font-size: 1.8rem;
-    margin-bottom: 15px;
-}
-
-.success-content p {
-    color: #ff6b9d;
-    font-size: 1.3rem;
-    margin-bottom: 20px;
-}
-
-.heart-explosion {
-    font-size: 2.5rem;
-    animation: heartBurst 1s ease-in-out infinite;
-}
-
-@keyframes heartBurst {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.2); }
-}
-
-/* Running message that appears */
-.running-message {
-    position: fixed;
-    background: white;
-    padding: 10px 20px;
-    border-radius: 20px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-    color: #ff6b9d;
-    font-size: 0.9rem;
-    pointer-events: none;
-    z-index: 999;
-    animation: messageFloat 2s ease-out forwards;
-}
-
-@keyframes messageFloat {
-    0% { transform: translateY(0) scale(0.8); opacity: 0; }
-    20% { transform: translateY(-20px) scale(1); opacity: 1; }
-    80% { transform: translateY(-40px) scale(1); opacity: 1; }
-    100% { transform: translateY(-60px) scale(0.8); opacity: 0; }
-}
-
-/* Responsive for Love Game */
+/* Responsive */
 @media (max-width: 600px) {
-    .love-game-options {
-        flex-direction: column;
-        gap: 20px;
+    .welcome-text {
+        font-size: 1.8rem;
     }
-    
-    .love-btn {
-        padding: 15px 40px;
-        font-size: 1.2rem;
+    .big-heart {
+        font-size: 80px;
     }
-    
-    .love-game-question {
-        font-size: 1.3rem;
+    .letter-container,
+    .quiz-card {
+        padding: 25px;
     }
-    
-    .love-yes.size-fill-screen {
-        font-size: 3.5rem;
+    .surprise-title {
+        font-size: 2rem;
     }
-    
-    .love-yes.size-fill-screen::after {
-        font-size: 1.5rem;
+    .photo-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
     }
-}
-
-
-/* When NO button is at bottom (escaping from big YES button) */
-.love-no.escaping {
-    background: linear-gradient(45deg, #ff6b6b, #ff8e8e) !important;
-    color: white !important;
-    border-color: #ff5252 !important;
-    box-shadow: 0 4px 20px rgba(255, 107, 107, 0.4);
-    animation: panic 0.3s ease infinite alternate;
-}
-
-@keyframes panic {
-    from { transform: scale(var(--btn-scale, 0.8)) rotate(-3deg); }
-    to { transform: scale(var(--btn-scale, 0.8)) rotate(3deg); }
-}
-
-/* Running message for escaping */
-.running-message.escaping-msg {
-    color: #ff5252;
-    font-weight: bold;
-    font-size: 1.1rem;
+    .gift-stage {
+        width: 100%;
+        height: 300px;
+    }
+    .surprise-message {
+        padding: 20px;
+        max-height: none;
+        max-width: 90%;
+    }
 }
