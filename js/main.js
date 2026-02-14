@@ -1,37 +1,33 @@
-// Gallery Data - แก้ไขเพิ่มรูปของคุณที่นี่
+// Gallery Data - แก้ไขเพิ่มรูปและวิดีโอของคุณที่นี่
+// type: 'image' หรือ 'video'
 const galleryData = {
     smile: {
         title: 'รอยยิ้มที่น่ารักของเธอ 😍',
-        images: [
-            // แก้ไขเป็น path รูปจริงของคุณ
-            // { src: 'images/smile/1.jpg', caption: 'ยิ้มตอนเจอกันครั้งแรก' },
-            // { src: 'images/smile/2.jpg', caption: 'ยิ้มตอนกินข้าว' },
-            // { src: 'images/smile/3.jpg', caption: 'ยิ้มที่สวนสาธารณะ' },
-            { emoji: '😊', caption: 'ยิ้มหวานๆ ของเธอ' },
-            { emoji: '🥰', caption: 'ยิ้มตอนมีความสุข' },
-            { emoji: '😍', caption: 'ยิ้มที่ทำให้ใจละลาย' },
+        items: [
+            // ตัวอย่างรูปภาพ
+            // { type: 'image', src: 'images/smile/1.jpg', caption: 'ยิ้มตอนเจอกันครั้งแรก' },
+            // { type: 'image', src: 'images/smile/2.jpg', caption: 'ยิ้มตอนกินข้าว' },
+            // ตัวอย่างวิดีโอ
+            // { type: 'video', src: 'videos/smile-moment.mp4', caption: 'วิดีโอน่ารัก' },
+            { type: 'image', emoji: '😊', caption: 'ยิ้มหวานๆ ของเธอ' },
+            { type: 'image', emoji: '🥰', caption: 'ยิ้มตอนมีความสุข' },
+            { type: 'video', emoji: '🎥', caption: 'วิดีโอน่ารักของเธอ' },
         ]
     },
     date: {
         title: 'เดทของเรา 💑',
-        images: [
-            // { src: 'images/date/1.jpg', caption: 'เดทแรกที่คาเฟ่' },
-            // { src: 'images/date/2.jpg', caption: 'ดูหนังด้วยกัน' },
-            // { src: 'images/date/3.jpg', caption: 'เที่ยวสวนสนุก' },
-            { emoji: '☕', caption: 'เดทที่คาเฟ่น่ารัก' },
-            { emoji: '🎬', caption: 'ดูหนังด้วยกัน' },
-            { emoji: '🎡', caption: 'เที่ยวสวนสนุก' },
+        items: [
+            { type: 'image', emoji: '☕', caption: 'เดทที่คาเฟ่น่ารัก' },
+            { type: 'video', emoji: '📹', caption: 'วิดีโอตอนเดท' },
+            { type: 'image', emoji: '🎡', caption: 'เที่ยวสวนสนุก' },
         ]
     },
     birthday: {
         title: 'วันเกิดปีที่แล้ว 🎂',
-        images: [
-            // { src: 'images/birthday/1.jpg', caption: 'เป่าเค้กวันเกิด' },
-            // { src: 'images/birthday/2.jpg', caption: 'ของขวัญวันเกิด' },
-            // { src: 'images/birthday/3.jpg', caption: 'ฉลองด้วยกัน' },
-            { emoji: '🎂', caption: 'เป่าเค้กวันเกิด' },
-            { emoji: '🎁', caption: 'ของขวัญสุดพิเศษ' },
-            { emoji: '🎉', caption: 'ฉลองด้วยกัน' },
+        items: [
+            { type: 'video', emoji: '🎬', caption: 'วิดีโอวันเกิด' },
+            { type: 'image', emoji: '🎂', caption: 'เป่าเค้กวันเกิด' },
+            { type: 'image', emoji: '🎁', caption: 'ของขวัญสุดพิเศษ' },
         ]
     }
 };
@@ -54,7 +50,7 @@ function openGallery(galleryId) {
     document.getElementById('modalTitle').textContent = data.title;
     document.getElementById('galleryModal').classList.add('active');
     
-    createDots(data.images.length);
+    createDots(data.items.length);
     showSlide(0);
     startSlideshow();
     
@@ -91,36 +87,99 @@ function showSlide(index) {
     if (!currentGallery) return;
     
     const data = galleryData[currentGallery];
-    const images = data.images;
+    const items = data.items;
     
     // Wrap around
-    if (index >= images.length) index = 0;
-    if (index < 0) index = images.length - 1;
+    if (index >= items.length) index = 0;
+    if (index < 0) index = items.length - 1;
     
     currentSlide = index;
     
-    const image = images[index];
+    const item = items[index];
     const slideImage = document.getElementById('slideImage');
     
-    // ถ้ามี src (รูปจริง) ใช้ img, ถ้าไม่มีใช้ emoji
-    if (image.src) {
-        slideImage.innerHTML = `<img src="${image.src}" alt="${image.caption}">`;
+    // ล้างเนื้อหาเก่า
+    slideImage.innerHTML = '';
+    slideImage.className = 'slide-image';
+    
+    if (item.type === 'video') {
+        // แสดงวิดีโอ
+        slideImage.classList.add('video-slide');
+        if (item.src) {
+            // มีไฟล์วิดีโอจริง
+            slideImage.innerHTML = `
+                <video controls autoplay muted playsinline 
+                    onplay="pauseSlideshow()" 
+                    onended="resumeSlideshow()"
+                    onpause="checkVideoEnded(this)">
+                    <source src="${item.src}" type="video/mp4">
+                    เบราว์เซอร์ไม่รองรับวิดีโอ
+                </video>
+            `;
+        } else {
+            // ใช้ emoji แทนตอนยังไม่มีไฟล์
+            slideImage.innerHTML = `<div class="video-placeholder">${item.emoji || '🎥'}</div>`;
+        }
+        pauseSlideshow();
     } else {
-        slideImage.innerHTML = image.emoji || '📷';
+        // แสดงรูปภาพ
+        if (item.src) {
+            slideImage.innerHTML = `<img src="${item.src}" alt="${item.caption}">`;
+        } else {
+            slideImage.innerHTML = item.emoji || '📷';
+        }
+        resumeSlideshow();
     }
     
-    document.getElementById('modalCaption').textContent = image.caption;
+    document.getElementById('modalCaption').textContent = item.caption;
     
     // Update dots
     document.querySelectorAll('.dot').forEach((dot, i) => {
         dot.classList.toggle('active', i === index);
+        // เพิ่ม icon แยกประเภท
+        const itemType = items[i].type;
+        dot.innerHTML = itemType === 'video' ? '🎬' : '';
     });
     
     // Reset progress bar animation
     const progressBar = document.getElementById('progressBar');
-    if (progressBar && isPlaying) {
+    if (progressBar && isPlaying && item.type !== 'video') {
         progressBar.classList.remove('animating');
         void progressBar.offsetWidth; // Force reflow
+        progressBar.classList.add('animating');
+    }
+}
+
+// Check if video ended
+function checkVideoEnded(video) {
+    if (video.ended || video.paused) {
+        resumeSlideshow();
+    }
+}
+
+// Pause slideshow
+function pauseSlideshow() {
+    if (slideInterval) {
+        clearInterval(slideInterval);
+        slideInterval = null;
+    }
+    const progressBar = document.getElementById('progressBar');
+    if (progressBar) {
+        progressBar.classList.remove('animating');
+    }
+}
+
+// Resume slideshow
+function resumeSlideshow() {
+    if (!isPlaying) return;
+    stopSlideshow();
+    slideInterval = setInterval(() => {
+        showSlide(currentSlide + 1);
+    }, SLIDE_DURATION);
+    const progressBar = document.getElementById('progressBar');
+    if (progressBar) {
+        progressBar.classList.remove('animating');
+        void progressBar.offsetWidth;
         progressBar.classList.add('animating');
     }
 }
@@ -512,21 +571,6 @@ document.addEventListener('click', (e) => {
         setTimeout(() => sparkle.remove(), 1000);
     }
 });
-
-// Video event handlers
-const video = document.getElementById('loveVideo');
-if (video) {
-    video.addEventListener('play', () => {
-        // Create music notes when video plays
-        createMusicNotes();
-    });
-    
-    video.addEventListener('ended', () => {
-        // Celebration when video ends
-        createConfettiBurst();
-        createRosePetals();
-    });
-}
 
 // Initialize
 createFloatingHearts();
