@@ -4,8 +4,19 @@ bgMusic.loop = true;
 bgMusic.volume = 0.1;
 
 function startMusic() {
-    bgMusic.play().catch(() => {});
+    if (bgMusic.paused) {
+        bgMusic.play().catch(() => {});
+    }
 }
+
+// Auto-play music on first user interaction (browser requires user gesture)
+function initMusicOnInteraction() {
+    startMusic();
+    document.removeEventListener('click', initMusicOnInteraction);
+    document.removeEventListener('touchstart', initMusicOnInteraction);
+}
+document.addEventListener('click', initMusicOnInteraction);
+document.addEventListener('touchstart', initMusicOnInteraction);
 
 // Gallery Data
 const galleryData = {
